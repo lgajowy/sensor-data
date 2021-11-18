@@ -1,6 +1,8 @@
 package org.lgajowy.sensordata.domain
 
-sealed trait Error {
+import scala.util.control.NoStackTrace
+
+sealed trait Error extends NoStackTrace {
   def message: String
 }
 
