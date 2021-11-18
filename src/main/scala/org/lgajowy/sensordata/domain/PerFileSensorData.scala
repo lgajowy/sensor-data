@@ -2,9 +2,9 @@ package org.lgajowy.sensordata.domain
 
 sealed trait PerFileSensorData
 
-case class FailedFileRead(csvFilePath: CSVFilePath) extends PerFileSensorData
+case class FailedFileRead(csvFile: CsvFile) extends PerFileSensorData
 
 case class CorrectPerFileSensorData(
-  csvFilePath: CSVFilePath,
+  csvFile: CsvFile,
   data: Map[SensorId, SensorData]
 )

@@ -6,8 +6,8 @@ sealed trait Error extends NoStackTrace {
   def message: String
 }
 
-case class CantReadDirectory(path: DirectoryPath) extends Error {
-  override val message: String = s"Directory ${path.path} could not be read"
+case class CantReadCsvFilesFromDirectory(path: DirectoryPath) extends Error {
+  override val message: String = s"Csv files from path: ${path.path} could not be read"
 }
 
 case class MissingDirectoryPathArgument(currentArgs: List[String]) extends Error {
