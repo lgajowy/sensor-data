@@ -1,3 +1,5 @@
 package org.lgajowy.sensordata.domain
 
-case class DirectoryPath(path: String)
+import java.nio.file.Path
+
+case class DirectoryPath(path: Path)
