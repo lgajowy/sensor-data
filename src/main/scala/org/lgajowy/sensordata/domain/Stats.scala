@@ -10,7 +10,22 @@ case class Stats(
 
 case class SensorStats(
   id: SensorId,
-  avg: AvgHumidity,
-  min: MinHumidity,
-  max: MaxHumidity
+  avg: Option[AvgHumidity],
+  min: Option[MinHumidity],
+  max: Option[MaxHumidity]
 )
+
+object SensorStats {
+  def apply(
+    id: SensorId,
+    sum: Option[SumHumidity],
+    min: Option[MinHumidity],
+    max: Option[MaxHumidity],
+    successfulMeasurements: SuccessfulMeasurements
+  ): SensorStats = SensorStats(
+    id,
+    sum.map(it => AvgHumidity(it.value / successfulMeasurements.value)),
+    min,
+    max
+  )
+}
