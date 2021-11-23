@@ -16,7 +16,7 @@ final case class Program[F[_]: MonadThrow: Parallel](
     for {
       directory <- commandLineArgumentsParser.parseDirectoryPath(args)
       files <- csvFileFinder.listCSVsInDirectory(directory)
-      perFileResults <- files.parFlatTraverse(sensorDataCollector.collectSensorData)
+      perFileResults <- files.parTraverse(sensorDataCollector.collectSensorData)
       stats <- sensorStatsCalculator.calculate(perFileResults)
       _ <- statsPrinter.print(stats)
     } yield ExitCode.Success

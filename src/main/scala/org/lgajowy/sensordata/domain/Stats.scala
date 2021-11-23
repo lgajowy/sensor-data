@@ -2,7 +2,7 @@ package org.lgajowy.sensordata.domain
 
 case class Stats(
   failedMeasurements: FailedMeasurements,
-  processedMeasurements: ProcessedMeasurements,
+  successfulMeasurements: SuccessfulMeasurements,
   processedFiles: ProcessedFiles,
   failedFiles: FailedFiles,
   sensorsByAvgHumidity: List[SensorStats]

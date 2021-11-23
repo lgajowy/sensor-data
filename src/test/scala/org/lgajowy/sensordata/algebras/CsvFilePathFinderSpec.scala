@@ -2,14 +2,13 @@ package org.lgajowy.sensordata.algebras
 
 import cats.effect.IO
 import cats.effect.testing.scalatest.AsyncIOSpec
-import org.lgajowy.sensordata.domain.{ CantReadCsvFilesFromDirectory, CsvFile, DirectoryPath }
+import org.lgajowy.sensordata.domain.{ CantReadCsvFilesFromDirectory, CsvFilePath, DirectoryPath }
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import java.io.File
 import java.nio.file.Paths
 
-class CsvFileFinderSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers {
+class CsvFilePathFinderSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers {
 
   it should "read only csv files recursively" in {
     val finder = CsvFileFinder.make[IO]()
@@ -19,8 +18,8 @@ class CsvFileFinderSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers {
       .asserting(
         _ shouldBe
           List(
-            CsvFile(new File("src/test/resources/testDir/foo/bar.csv")),
-            CsvFile(new File("src/test/resources/testDir/foo/boo/csv.csv"))
+            CsvFilePath(Paths.get("src/test/resources/testDir/foo/bar.csv")),
+            CsvFilePath(Paths.get("src/test/resources/testDir/foo/boo/csv.csv"))
           )
       )
   }
