@@ -2,7 +2,7 @@ package org.lgajowy.sensordata.domain
 
 import cats.Monoid
 
-case class MinHumidity(value: Int)
+case class MinHumidity(value: Int) extends AnyVal
 
 object MinHumidity {
   implicit val monoidMinHumidity: Monoid[MinHumidity] = new Monoid[MinHumidity] {

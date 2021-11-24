@@ -2,7 +2,7 @@ package org.lgajowy.sensordata.domain
 
 import cats.kernel.Monoid
 
-case class FailedMeasurements(value: Int) {
+case class FailedMeasurements(value: Int) extends AnyVal {
   def increment() = FailedMeasurements(this.value + 1)
 }
 
