@@ -39,7 +39,7 @@ class StatsPrinterSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers {
         )
       )
       .asserting(_ => {
-        testConsole.lines shouldBe List(
+        testConsole.lines shouldBe Vector(
           "Num of processed files: 3",
           "Num of failed files: 1",
           "Num of processed measurements: 6",
