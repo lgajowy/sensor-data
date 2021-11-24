@@ -1,10 +1,9 @@
 package org.lgajowy.sensordata.algebras
 
-import cats.{Applicative, Monad}
 import cats.effect.Sync
 import cats.effect.std.Console
 import cats.implicits._
-import org.lgajowy.sensordata.domain.{SensorStats, Stats}
+import org.lgajowy.sensordata.domain.{ SensorStats, Stats }
 
 trait StatsPrinter[F[_]] {
   def print(stats: Stats): F[Unit]
