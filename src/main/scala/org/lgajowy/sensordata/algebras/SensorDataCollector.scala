@@ -15,27 +15,8 @@ object SensorDataCollector {
   def make[F[_]: Files: Sync: Functor](): SensorDataCollector[F] = new SensorDataCollector[F] {
 
     override def collectSensorData(csvPath: CsvFilePath): F[PerFileSensorData] = {
-
-      case class Row(sensorId: SensorId, humidity: Option[Humidity])
-
-      val parseRow: List[String] => Option[Row] = {
-        case id :: value :: Nil if value.toLowerCase() == "nan" => Some(Row(SensorId(id), None))
-        case id :: value :: Nil                                 => Some(Row(SensorId(id), Some(Humidity(value))))
-        case _                                                  => None
-      }
-
-      def csvParser: Pipe[F, Byte, List[String]] =
-        _.through(text.utf8.decode)
-          .through(text.lines)
-          .drop(1)
-          .map(_.split(',').toList)
-
       Files[F]
-        .readAll(
-          Path.fromNioPath(csvPath.path),
-          4096,
-          Flags.Read
-        )
+        .readAll(Path.fromNioPath(csvPath.path), 4096, Flags.Read)
         .through(csvParser)
         .map(parseRow)
         .unNoneTerminate
@@ -58,5 +39,19 @@ object SensorDataCollector {
           case Right(value) => CorrectPerFileSensorData(csvPath, value)
         }
     }
+
+    private def parseRow: List[String] => Option[Row] = {
+      case id :: value :: Nil if value.toLowerCase() == "nan" => Some(Row(SensorId(id), None))
+      case id :: value :: Nil                                 => Some(Row(SensorId(id), Some(Humidity(value))))
+      case _                                                  => None
+    }
+
+    private def csvParser: Pipe[F, Byte, List[String]] =
+      _.through(text.utf8.decode)
+        .through(text.lines)
+        .drop(1)
+        .map(_.split(',').toList)
+
+    private case class Row(sensorId: SensorId, humidity: Option[Humidity])
   }
 }

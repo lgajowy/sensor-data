@@ -1,7 +1,7 @@
 package org.lgajowy.sensordata.domain
 
 import cats.Monoid
-import cats.implicits.catsSyntaxOptionId
+import cats.implicits.{ catsSyntaxOptionId, catsSyntaxSemigroup }
 
 case class SensorData(
   min: Option[MinHumidity],
@@ -15,9 +15,9 @@ case class SensorData(
       case None => this.copy(failedMeasurements = failedMeasurements.increment())
       case Some(Humidity(newValue)) =>
         this.copy(
-          min = MinHumidity.getSmaller(this.min, Some(MinHumidity(newValue))),
-          max = MaxHumidity.getGreater(this.max, Some(MaxHumidity(newValue))),
-          sum = SumHumidity.getSum(this.sum, Some(SumHumidity(newValue))),
+          this.min |+| MinHumidity(newValue).some,
+          this.max |+| MaxHumidity(newValue).some,
+          this.sum |+| SumHumidity(newValue).some,
           this.failedMeasurements,
           this.successfulMeasurements.increment()
         )
@@ -28,22 +28,8 @@ case class SensorData(
 object SensorData {
   def apply(humidity: Option[Humidity]): SensorData = {
     humidity match {
-      case None =>
-        SensorData(
-          None,
-          None,
-          None,
-          FailedMeasurements(1),
-          SuccessfulMeasurements(0)
-        )
-      case Some(humidity) =>
-        SensorData(
-          MinHumidity(humidity.value).some,
-          MaxHumidity(humidity.value).some,
-          SumHumidity(humidity.value).some,
-          FailedMeasurements(0),
-          SuccessfulMeasurements(1)
-        )
+      case None    => Monoid[SensorData].empty.update(None)
+      case Some(_) => Monoid[SensorData].empty.update(humidity)
     }
   }
 
@@ -52,16 +38,16 @@ object SensorData {
       None,
       None,
       None,
-      FailedMeasurements(0),
-      SuccessfulMeasurements(0)
+      Monoid[FailedMeasurements].empty,
+      Monoid[SuccessfulMeasurements].empty
     )
 
     override def combine(x: SensorData, y: SensorData): SensorData = SensorData(
-      MinHumidity.getSmaller(x.min, y.min),
-      MaxHumidity.getGreater(x.max, y.max),
-      SumHumidity.getSum(x.sum, y.sum),
-      Monoid[FailedMeasurements].combine(x.failedMeasurements, y.failedMeasurements),
-      Monoid[SuccessfulMeasurements].combine(x.successfulMeasurements, y.successfulMeasurements)
+      x.min |+| y.min,
+      x.max |+| y.max,
+      x.sum |+| y.sum,
+      x.failedMeasurements |+| y.failedMeasurements,
+      x.successfulMeasurements |+| y.successfulMeasurements
     )
   }
 }
@@ -69,37 +55,25 @@ object SensorData {
 case class MinHumidity(value: Int)
 
 object MinHumidity {
-  def getSmaller(x: Option[MinHumidity], y: Option[MinHumidity]): Option[MinHumidity] = {
-    (x, y) match {
-      case (Some(xVal), Some(yVal)) => Some(MinHumidity(Math.min(xVal.value, yVal.value)))
-      case (Some(value), None)      => Some(value)
-      case (None, Some(value))      => Some(value)
-      case (None, None)             => None
-    }
+  implicit val monoidMinHumidity: Monoid[MinHumidity] = new Monoid[MinHumidity] {
+    override def empty: MinHumidity = MinHumidity(0)
+    override def combine(x: MinHumidity, y: MinHumidity): MinHumidity = MinHumidity(Math.min(x.value, y.value))
   }
 }
 case class MaxHumidity(value: Int)
 
 object MaxHumidity {
-  def getGreater(x: Option[MaxHumidity], y: Option[MaxHumidity]): Option[MaxHumidity] = {
-    (x, y) match {
-      case (Some(xVal), Some(yVal)) => Some(MaxHumidity(Math.max(xVal.value, yVal.value)))
-      case (Some(value), None)      => Some(value)
-      case (None, Some(value))      => Some(value)
-      case (None, None)             => None
-    }
+  implicit val monoidMaxHumidity: Monoid[MaxHumidity] = new Monoid[MaxHumidity] {
+    override def empty: MaxHumidity = MaxHumidity(0)
+    override def combine(x: MaxHumidity, y: MaxHumidity): MaxHumidity = MaxHumidity(Math.max(x.value, y.value))
   }
 }
 
 case class SumHumidity(value: Int)
 
 object SumHumidity {
-  def getSum(x: Option[SumHumidity], y: Option[SumHumidity]): Option[SumHumidity] = {
-    (x, y) match {
-      case (Some(xVal), Some(yVal)) => Some(SumHumidity(xVal.value + yVal.value))
-      case (Some(value), None)      => Some(value)
-      case (None, Some(value))      => Some(value)
-      case (None, None)             => None
-    }
+  implicit val monoidSumHumidity: Monoid[SumHumidity] = new Monoid[SumHumidity] {
+    override def empty: SumHumidity = SumHumidity(0)
+    override def combine(x: SumHumidity, y: SumHumidity): SumHumidity = SumHumidity(x.value + y.value)
   }
 }
