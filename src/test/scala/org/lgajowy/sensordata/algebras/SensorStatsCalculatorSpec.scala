@@ -89,4 +89,38 @@ class SensorStatsCalculatorSpec extends AsyncFlatSpec with AsyncIOSpec with Matc
         )
       )
   }
+
+  it should "round not using floor but using 0.5 as the rounding point" in {
+    val calculator = SensorStatsCalculator.make[IO]()
+
+    calculator
+      .calculate(
+        List(
+          CorrectPerFileSensorData(
+            CsvFilePath(Paths.get("foo")),
+            Map(
+              SensorId("s1") -> SensorData(
+                MinHumidity(3).some,
+                MaxHumidity(3).some,
+                SumHumidity(3).some,
+                FailedMeasurements(0),
+                SuccessfulMeasurements(2)
+              ),
+              SensorId("s2") -> SensorData(
+                MinHumidity(2).some,
+                MaxHumidity(2).some,
+                SumHumidity(2).some,
+                FailedMeasurements(0),
+                SuccessfulMeasurements(3)
+              )
+            )
+          )
+        )
+      )
+      .asserting(result => {
+        result.sensorsByAvgHumidity.head.avg shouldBe AvgHumidity(2).some
+        result.sensorsByAvgHumidity.last.avg shouldBe AvgHumidity(1).some
+      })
+
+  }
 }

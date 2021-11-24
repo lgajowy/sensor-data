@@ -33,7 +33,7 @@ class ProgramSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers {
             "Num of failed measurements: 6",
             "Sensors with highest avg humidity:",
             "sensor-id,min,avg,max",
-            "s2,1,61,88",
+            "s2,1,62,88",
             "s1,10,54,98",
             "s3,NaN,NaN,NaN"
           )

@@ -24,7 +24,7 @@ object SensorStats {
     successfulMeasurements: SuccessfulMeasurements
   ): SensorStats = SensorStats(
     id,
-    sum.map(it => AvgHumidity(it.value / successfulMeasurements.value)),
+    sum.map(it => AvgHumidity((it.value.toDouble / successfulMeasurements.value).round.toInt)),
     min,
     max
   )
