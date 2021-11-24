@@ -1,34 +1,14 @@
 package org.lgajowy.sensordata.algebras
 
-import cats.Show
 import cats.effect.IO
-import cats.effect.std.Console
 import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.implicits.catsSyntaxOptionId
 import org.lgajowy.sensordata.domain._
+import org.lgajowy.sensordata.testutils.TestConsole
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import java.nio.charset.Charset
-
 class StatsPrinterSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers {
-
-  class TestConsole extends Console[IO] {
-
-    var lines: Vector[String] = Vector[String]()
-
-    override def readLineWithCharset(charset: Charset): IO[String] = ???
-
-    override def print[A](a: A)(implicit S: Show[A]): IO[Unit] = ???
-
-    override def println[A](a: A)(implicit S: Show[A]): IO[Unit] = IO.pure {
-      lines = lines ++ Vector(Show[A].show(a))
-    }
-
-    override def error[A](a: A)(implicit S: Show[A]): IO[Unit] = ???
-
-    override def errorln[A](a: A)(implicit S: Show[A]): IO[Unit] = ???
-  }
 
   it should "print the given stats correctly" in {
 
